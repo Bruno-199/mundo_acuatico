@@ -8,11 +8,11 @@ const api = {
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`);
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
       }
       return await response.json();
     } catch (error) {
-      console.error('Error en GET:', error);
+      console.error(`Error en GET ${endpoint}:`, error);
       throw error;
     }
   },
@@ -28,11 +28,11 @@ const api = {
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
       }
       return await response.json();
     } catch (error) {
-      console.error('Error en POST:', error);
+      console.error(`Error en POST ${endpoint}:`, error);
       throw error;
     }
   },
@@ -48,11 +48,11 @@ const api = {
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
       }
       return await response.json();
     } catch (error) {
-      console.error('Error en PUT:', error);
+      console.error(`Error en PUT ${endpoint}:`, error);
       throw error;
     }
   },
@@ -64,11 +64,11 @@ const api = {
         method: 'DELETE',
       });
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
       }
       return await response.json();
     } catch (error) {
-      console.error('Error en DELETE:', error);
+      console.error(`Error en DELETE ${endpoint}:`, error);
       throw error;
     }
   },

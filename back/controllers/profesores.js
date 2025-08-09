@@ -3,10 +3,15 @@ const { conection } = require("../config/db");
 
 //crea la funcion con los paramtros request y response
 const todoProfesores = (req, res) => {
-  const query = "SELECT * FROM profesores WHERE estado = 'Activo';";
+  console.log('Controller profesores - Recibida petición GET /profesores');
+  const query = "SELECT * FROM profesores ORDER BY fecha_creacion DESC;";
 
   conection.query(query, (err, results) => {
-    if (err) throw err;
+    if (err) {
+      console.error('Controller profesores - Error en consulta:', err);
+      throw err;
+    }
+    console.log('Controller profesores - Resultados obtenidos:', results.length, 'profesores');
     res.json(results);
   });
 };

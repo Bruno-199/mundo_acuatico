@@ -212,17 +212,21 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 10000; /* Z-index alto para estar por encima de todo */
   }
 
   .modal {
-    background-color: white;
+    background-color: white !important;
     border-radius: 8px;
     width: 90%;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 10001;
+    margin: auto;
+    display: block;
   }
 
   .modal-header {
@@ -343,6 +347,75 @@
     color: #666;
   }
 
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .error-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 40px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .error-message i {
+    font-size: 24px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .error-message p {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+  }
+
+  .btn-retry {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+  }
+
+  .btn-retry:hover {
+    background-color: #c82333;
+  }
+
   .error {
     text-align: center;
     padding: 20px;
@@ -350,6 +423,93 @@
     color: #721c24;
     border-radius: 4px;
     margin-bottom: 20px;
+  }
+
+  /* Estilos para validaciones de formulario */
+  .form-group input.error,
+  .form-group textarea.error,
+  .form-group select.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+  }
+
+  .error-text {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .form-help {
+    color: #6c757d;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Estilos para campo de contraseña */
+  .password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .password-input-container input {
+    padding-right: 40px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+    padding: 4px;
+    font-size: 14px;
+  }
+
+  .password-toggle:hover {
+    color: #333;
+  }
+
+  /* Estilos para botones con estado de carga */
+  .modal-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .modal-actions button.loading {
+    position: relative;
+  }
+
+  .modal-actions button.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Mejoras para botones de acción */
+  .btn-editar:disabled,
+  .btn-eliminar:disabled,
+  .btn-publicar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-editar:disabled:hover,
+  .btn-eliminar:disabled:hover,
+  .btn-publicar:disabled:hover {
+    background-color: inherit;
   }
 
 @media (max-width: 768px) {

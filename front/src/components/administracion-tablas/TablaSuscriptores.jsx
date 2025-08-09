@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../config/api';
 import '../../css/TablaStyles.css';
 
@@ -136,7 +136,14 @@ const TablaSuscriptores = () => {
         </button>
       </div>
       
-      <table className="tabla-admin">
+      <div style={{
+        maxHeight: '70vh',
+        overflowY: 'auto',
+        overflowX: 'auto',
+        border: '1px solid #ddd',
+        borderRadius: '8px'
+      }}>
+        <table className="tabla-admin">
         <thead>
           <tr>
             <th>ID</th>
@@ -185,74 +192,197 @@ const TablaSuscriptores = () => {
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Modal para agregar/editar suscriptor */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h3>{editingSuscriptor ? 'Editar Suscriptor' : 'Agregar Suscriptor'}</h3>
+        <div 
+          style={{
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 999999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '30px',
+              borderRadius: '10px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              borderBottom: '1px solid #eee',
+              paddingBottom: '15px'
+            }}>
+              <h3 style={{margin: 0, color: '#333'}}>
+                {editingSuscriptor ? 'Editar Suscriptor' : 'Agregar Suscriptor'}
+              </h3>
               <button 
-                className="modal-close"
                 onClick={() => setShowModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
               >
                 ×
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Nombre:</label>
+
+            <form onSubmit={handleSubmit}>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Nombre: *
+                  </label>
                   <input
                     type="text"
+                    id="suscriptor-nombre"
+                    name="nombre"
                     value={formData.nombre}
                     onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                     required
+                    autoComplete="name"
                   />
                 </div>
-                <div className="form-group">
-                  <label>DNI:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    DNI:
+                  </label>
                   <input
                     type="text"
+                    id="suscriptor-dni"
+                    name="dni"
                     value={formData.dni}
                     onChange={(e) => setFormData({...formData, dni: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
+                    placeholder="12345678"
                   />
                 </div>
               </div>
               
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Email:</label>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Email:
+                  </label>
                   <input
                     type="email"
+                    id="suscriptor-email"
+                    name="email"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
+                    autoComplete="email"
+                    placeholder="ejemplo@email.com"
                   />
                 </div>
-                <div className="form-group">
-                  <label>Teléfono:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Teléfono:
+                  </label>
                   <input
                     type="tel"
+                    id="suscriptor-telefono"
+                    name="telefono"
                     value={formData.telefono}
                     onChange={(e) => setFormData({...formData, telefono: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
+                    autoComplete="tel"
+                    placeholder="+54 11 1234-5678"
                   />
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Fecha de nacimiento:</label>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Fecha de nacimiento:
+                  </label>
                   <input
                     type="date"
+                    id="suscriptor-fecha-nacimiento"
+                    name="fecha_nacimiento"
                     value={formData.fecha_nacimiento}
                     onChange={(e) => setFormData({...formData, fecha_nacimiento: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
+                    autoComplete="bday"
                   />
                 </div>
-                <div className="form-group">
-                  <label>Estado:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Estado:
+                  </label>
                   <select
+                    id="suscriptor-estado"
+                    name="estado"
                     value={formData.estado}
                     onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                   >
                     <option value="Activo">Activo</option>
                     <option value="Pendiente">Pendiente</option>
@@ -261,48 +391,132 @@ const TablaSuscriptores = () => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Dirección:</label>
+              <div style={{marginBottom: '15px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  Dirección:
+                </label>
                 <textarea
+                  id="suscriptor-direccion"
+                  name="direccion"
                   value={formData.direccion}
                   onChange={(e) => setFormData({...formData, direccion: e.target.value})}
                   rows={2}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    resize: 'vertical'
+                  }}
+                  autoComplete="address"
+                  placeholder="Calle, número, ciudad, provincia"
                 />
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Contacto de emergencia:</label>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Contacto de emergencia:
+                  </label>
                   <input
                     type="text"
+                    id="suscriptor-contacto-emergencia"
+                    name="contacto_emergencia"
                     value={formData.contacto_emergencia}
                     onChange={(e) => setFormData({...formData, contacto_emergencia: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
+                    placeholder="Nombre del contacto"
                   />
                 </div>
-                <div className="form-group">
-                  <label>Teléfono de emergencia:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Teléfono de emergencia:
+                  </label>
                   <input
                     type="tel"
+                    id="suscriptor-telefono-emergencia"
+                    name="telefono_emergencia"
                     value={formData.telefono_emergencia}
                     onChange={(e) => setFormData({...formData, telefono_emergencia: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
+                    placeholder="+54 11 1234-5678"
                   />
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Observaciones:</label>
+              <div style={{marginBottom: '20px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  Observaciones:
+                </label>
                 <textarea
+                  id="suscriptor-observaciones"
+                  name="observaciones"
                   value={formData.observaciones}
                   onChange={(e) => setFormData({...formData, observaciones: e.target.value})}
                   rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    resize: 'vertical'
+                  }}
+                  placeholder="Observaciones adicionales..."
                 />
               </div>
 
-              <div className="modal-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+                borderTop: '1px solid #eee',
+                paddingTop: '20px'
+              }}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    padding: '10px 20px',
+                    border: '1px solid #ddd',
+                    backgroundColor: '#f5f5f5',
+                    color: '#333',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
                   Cancelar
                 </button>
-                <button type="submit">
+                <button 
+                  type="submit"
+                  style={{
+                    padding: '10px 20px',
+                    border: 'none',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
                   {editingSuscriptor ? 'Actualizar' : 'Crear'}
                 </button>
               </div>

@@ -3,7 +3,7 @@ const { conection } = require("../config/db");
 
 //crea la funcion con los paramtros request y response
 const todoUsuarios = (req, res) => {
-  const query = "SELECT id, usuario, nombre, rol, ultimo_acceso, estado, fecha_creacion FROM usuarios WHERE estado = 'Activo';";
+  const query = "SELECT id, usuario, nombre, rol, ultimo_acceso, estado, fecha_creacion FROM usuarios ORDER BY fecha_creacion DESC;";
 
   conection.query(query, (err, results) => {
     if (err) throw err;

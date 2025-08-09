@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../config/api';
 import '../../css/TablaStyles.css';
 
@@ -154,7 +154,14 @@ const TablaHorarios = () => {
         </button>
       </div>
       
-      <table className="tabla-admin">
+      <div style={{
+        maxHeight: '70vh',
+        overflowY: 'auto',
+        overflowX: 'auto',
+        border: '1px solid #ddd',
+        borderRadius: '8px'
+      }}>
+        <table className="tabla-admin">
         <thead>
           <tr>
             <th>ID</th>
@@ -213,27 +220,83 @@ const TablaHorarios = () => {
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Modal para agregar/editar horario */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h3>{editingHorario ? 'Editar Horario' : 'Agregar Horario'}</h3>
+        <div 
+          style={{
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 999999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '30px',
+              borderRadius: '10px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              borderBottom: '1px solid #eee',
+              paddingBottom: '15px'
+            }}>
+              <h3 style={{margin: 0, color: '#333'}}>
+                {editingHorario ? 'Editar Horario' : 'Agregar Horario'}
+              </h3>
               <button 
-                className="modal-close"
                 onClick={() => setShowModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
               >
                 ×
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Actividad:</label>
+
+            <form onSubmit={handleSubmit}>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Actividad: *
+                  </label>
                   <select
+                    id="horario-actividad"
+                    name="actividad_id"
                     value={formData.actividad_id}
                     onChange={(e) => setFormData({...formData, actividad_id: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                     required
                   >
                     <option value="">Seleccionar actividad</option>
@@ -244,11 +307,23 @@ const TablaHorarios = () => {
                     ))}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Profesor:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Profesor: *
+                  </label>
                   <select
+                    id="horario-profesor"
+                    name="profesor_id"
                     value={formData.profesor_id}
                     onChange={(e) => setFormData({...formData, profesor_id: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                     required
                   >
                     <option value="">Seleccionar profesor</option>
@@ -261,55 +336,115 @@ const TablaHorarios = () => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Días de la semana:</label>
+              <div style={{marginBottom: '15px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  Días de la semana: *
+                </label>
                 <input
                   type="text"
+                  id="horario-dias"
+                  name="dias_semana"
                   value={formData.dias_semana}
                   onChange={(e) => setFormData({...formData, dias_semana: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
                   placeholder="Ej: Lunes, Miércoles, Viernes"
                   required
                 />
-                <small>Separar días con comas</small>
+                <small style={{color: '#666', fontSize: '12px'}}>Separar días con comas</small>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Hora inicio:</label>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Hora inicio: *
+                  </label>
                   <input
                     type="time"
+                    id="horario-hora-inicio"
+                    name="hora_inicio"
                     value={formData.hora_inicio}
                     onChange={(e) => setFormData({...formData, hora_inicio: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                     required
                   />
                 </div>
-                <div className="form-group">
-                  <label>Hora fin:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Hora fin: *
+                  </label>
                   <input
                     type="time"
+                    id="horario-hora-fin"
+                    name="hora_fin"
                     value={formData.hora_fin}
                     onChange={(e) => setFormData({...formData, hora_fin: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                     required
                   />
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Cupo máximo:</label>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Cupo máximo: *
+                  </label>
                   <input
                     type="number"
+                    id="horario-cupo"
+                    name="cupo_maximo"
                     min="1"
                     value={formData.cupo_maximo}
                     onChange={(e) => setFormData({...formData, cupo_maximo: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                     required
                   />
                 </div>
-                <div className="form-group">
-                  <label>Estado:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Estado:
+                  </label>
                   <select
+                    id="horario-estado"
+                    name="activo"
                     value={formData.activo}
                     onChange={(e) => setFormData({...formData, activo: e.target.value === 'true'})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                   >
                     <option value={true}>Activo</option>
                     <option value={false}>Inactivo</option>
@@ -317,21 +452,63 @@ const TablaHorarios = () => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Observaciones:</label>
+              <div style={{marginBottom: '20px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  Observaciones:
+                </label>
                 <textarea
+                  id="horario-observaciones"
+                  name="observaciones"
                   value={formData.observaciones}
                   onChange={(e) => setFormData({...formData, observaciones: e.target.value})}
                   rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    resize: 'vertical'
+                  }}
                   placeholder="Observaciones adicionales..."
                 />
               </div>
 
-              <div className="modal-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+                borderTop: '1px solid #eee',
+                paddingTop: '20px'
+              }}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    padding: '10px 20px',
+                    border: '1px solid #ddd',
+                    backgroundColor: '#f5f5f5',
+                    color: '#333',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
                   Cancelar
                 </button>
-                <button type="submit">
+                <button 
+                  type="submit"
+                  style={{
+                    padding: '10px 20px',
+                    border: 'none',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
                   {editingHorario ? 'Actualizar' : 'Crear'}
                 </button>
               </div>

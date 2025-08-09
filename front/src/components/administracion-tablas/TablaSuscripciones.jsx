@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../config/api';
 import '../../css/TablaStyles.css';
 
@@ -169,7 +169,14 @@ const TablaSuscripciones = () => {
         </button>
       </div>
       
-      <table className="tabla-admin">
+      <div style={{
+        maxHeight: '70vh',
+        overflowY: 'auto',
+        overflowX: 'auto',
+        border: '1px solid #ddd',
+        borderRadius: '8px'
+      }}>
+        <table className="tabla-admin">
         <thead>
           <tr>
             <th>ID</th>
@@ -248,29 +255,86 @@ const TablaSuscripciones = () => {
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Modal para agregar/editar suscripción */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h3>{editingSuscripcion ? 'Editar Suscripción' : 'Agregar Suscripción'}</h3>
+        <div 
+          style={{
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 999999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '30px',
+              borderRadius: '10px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              borderBottom: '1px solid #eee',
+              paddingBottom: '15px'
+            }}>
+              <h3 style={{margin: 0, color: '#333'}}>
+                {editingSuscripcion ? 'Editar Suscripción' : 'Agregar Suscripción'}
+              </h3>
               <button 
-                className="modal-close"
                 onClick={() => setShowModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
               >
                 ×
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Suscriptor:</label>
+
+            <form onSubmit={handleSubmit}>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Suscriptor: *
+                  </label>
                   <select
+                    id="suscripcion-suscriptor"
+                    name="suscriptor_id"
                     value={formData.suscriptor_id}
                     onChange={(e) => setFormData({...formData, suscriptor_id: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box',
+                      backgroundColor: editingSuscripcion ? '#f5f5f5' : 'white'
+                    }}
                     required
-                    disabled={editingSuscripcion} // No permitir cambiar suscriptor al editar
+                    disabled={editingSuscripcion}
                   >
                     <option value="">Seleccionar suscriptor</option>
                     {suscriptores.map(suscriptor => (
@@ -280,11 +344,23 @@ const TablaSuscripciones = () => {
                     ))}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Horario:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Horario: *
+                  </label>
                   <select
+                    id="suscripcion-horario"
+                    name="horario_id"
                     value={formData.horario_id}
                     onChange={(e) => setFormData({...formData, horario_id: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                     required
                   >
                     <option value="">Seleccionar horario</option>
@@ -297,32 +373,68 @@ const TablaSuscripciones = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Fecha inicio:</label>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Fecha inicio: *
+                  </label>
                   <input
                     type="date"
+                    id="suscripcion-fecha-inicio"
+                    name="fecha_inicio"
                     value={formData.fecha_inicio}
                     onChange={(e) => setFormData({...formData, fecha_inicio: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                     required
                   />
                 </div>
-                <div className="form-group">
-                  <label>Fecha fin:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Fecha fin:
+                  </label>
                   <input
                     type="date"
+                    id="suscripcion-fecha-fin"
+                    name="fecha_fin"
                     value={formData.fecha_fin}
                     onChange={(e) => setFormData({...formData, fecha_fin: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Estado:</label>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Estado:
+                  </label>
                   <select
+                    id="suscripcion-estado"
+                    name="estado"
                     value={formData.estado}
                     onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                   >
                     <option value="Activa">Activa</option>
                     <option value="Pendiente">Pendiente</option>
@@ -330,32 +442,68 @@ const TablaSuscripciones = () => {
                     <option value="Cancelada">Cancelada</option>
                   </select>
                 </div>
-                <div className="form-group">
-                  <label>Monto mensual:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Monto mensual:
+                  </label>
                   <input
                     type="number"
+                    id="suscripcion-monto"
+                    name="monto_mensual"
                     step="0.01"
                     min="0"
                     value={formData.monto_mensual}
                     onChange={(e) => setFormData({...formData, monto_mensual: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Fecha último pago:</label>
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Fecha último pago:
+                  </label>
                   <input
                     type="date"
+                    id="suscripcion-ultimo-pago"
+                    name="fecha_ultimo_pago"
                     value={formData.fecha_ultimo_pago}
                     onChange={(e) => setFormData({...formData, fecha_ultimo_pago: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                   />
                 </div>
-                <div className="form-group">
-                  <label>Método de pago:</label>
+                <div>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Método de pago:
+                  </label>
                   <select
+                    id="suscripcion-metodo-pago"
+                    name="metodo_pago"
                     value={formData.metodo_pago}
                     onChange={(e) => setFormData({...formData, metodo_pago: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                   >
                     <option value="Efectivo">Efectivo</option>
                     <option value="Tarjeta">Tarjeta</option>
@@ -365,21 +513,63 @@ const TablaSuscripciones = () => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Observaciones:</label>
+              <div style={{marginBottom: '20px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  Observaciones:
+                </label>
                 <textarea
+                  id="suscripcion-observaciones"
+                  name="observaciones"
                   value={formData.observaciones}
                   onChange={(e) => setFormData({...formData, observaciones: e.target.value})}
                   rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    resize: 'vertical'
+                  }}
                   placeholder="Observaciones adicionales..."
                 />
               </div>
 
-              <div className="modal-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+                borderTop: '1px solid #eee',
+                paddingTop: '20px'
+              }}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    padding: '10px 20px',
+                    border: '1px solid #ddd',
+                    backgroundColor: '#f5f5f5',
+                    color: '#333',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
                   Cancelar
                 </button>
-                <button type="submit">
+                <button 
+                  type="submit"
+                  style={{
+                    padding: '10px 20px',
+                    border: 'none',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
                   {editingSuscripcion ? 'Actualizar' : 'Crear'}
                 </button>
               </div>

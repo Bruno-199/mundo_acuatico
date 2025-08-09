@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../config/api';
 import '../../css/TablaStyles.css';
 
@@ -116,7 +116,14 @@ const TablaNoticias = () => {
         </button>
       </div>
       
-      <table className="tabla-admin">
+      <div style={{
+        maxHeight: '70vh',
+        overflowY: 'auto',
+        overflowX: 'auto',
+        border: '1px solid #ddd',
+        borderRadius: '8px'
+      }}>
+        <table className="tabla-admin">
         <thead>
           <tr>
             <th>ID</th>
@@ -172,73 +179,215 @@ const TablaNoticias = () => {
           ))}
         </tbody>
       </table>
+      </div>
 
       {/* Modal para agregar/editar noticia */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h3>{editingNoticia ? 'Editar Noticia' : 'Agregar Noticia'}</h3>
+        <div 
+          style={{
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 999999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setShowModal(false)}
+        >
+          <div 
+            style={{
+              backgroundColor: 'white',
+              padding: '30px',
+              borderRadius: '10px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              borderBottom: '1px solid #eee',
+              paddingBottom: '15px'
+            }}>
+              <h3 style={{margin: 0, color: '#333'}}>
+                {editingNoticia ? 'Editar Noticia' : 'Agregar Noticia'}
+              </h3>
               <button 
-                className="modal-close"
                 onClick={() => setShowModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
               >
                 ×
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="modal-form">
-              <div className="form-group">
-                <label>Título:</label>
+
+            <form onSubmit={handleSubmit}>
+              <div style={{marginBottom: '15px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  Título: *
+                </label>
                 <input
                   type="text"
+                  id="noticia-titulo"
+                  name="titulo"
                   value={formData.titulo}
                   onChange={(e) => setFormData({...formData, titulo: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
                   required
+                  autoComplete="off"
                 />
               </div>
-              <div className="form-group">
-                <label>Contenido:</label>
+              
+              <div style={{marginBottom: '15px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  Contenido: *
+                </label>
                 <textarea
+                  id="noticia-contenido"
+                  name="contenido"
                   value={formData.contenido}
                   onChange={(e) => setFormData({...formData, contenido: e.target.value})}
                   rows={4}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box',
+                    resize: 'vertical'
+                  }}
                   required
                 />
               </div>
-              <div className="form-group">
-                <label>URL de imagen:</label>
+              
+              <div style={{marginBottom: '15px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  URL de imagen:
+                </label>
                 <input
                   type="url"
+                  id="noticia-imagen-url"
+                  name="imagen_url"
                   value={formData.imagen_url}
                   onChange={(e) => setFormData({...formData, imagen_url: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                  placeholder="https://..."
                 />
               </div>
-              <div className="form-group">
-                <label>Estado:</label>
+              
+              <div style={{marginBottom: '15px'}}>
+                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                  Estado:
+                </label>
                 <select
+                  id="noticia-estado"
+                  name="estado"
                   value={formData.estado}
                   onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '5px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
                 >
                   <option value="Borrador">Borrador</option>
                   <option value="Publicado">Publicado</option>
                   <option value="Archivado">Archivado</option>
                 </select>
               </div>
+              
               {formData.estado === 'Publicado' && (
-                <div className="form-group">
-                  <label>Fecha de publicación:</label>
+                <div style={{marginBottom: '15px'}}>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Fecha de publicación:
+                  </label>
                   <input
                     type="date"
+                    id="noticia-fecha-publicacion"
+                    name="fecha_publicacion"
                     value={formData.fecha_publicacion}
                     onChange={(e) => setFormData({...formData, fecha_publicacion: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
                   />
                 </div>
               )}
-              <div className="modal-actions">
-                <button type="button" onClick={() => setShowModal(false)}>
+              
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '10px',
+                borderTop: '1px solid #eee',
+                paddingTop: '20px',
+                marginTop: '20px'
+              }}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    padding: '10px 20px',
+                    border: '1px solid #ddd',
+                    backgroundColor: '#f5f5f5',
+                    color: '#333',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
                   Cancelar
                 </button>
-                <button type="submit">
+                <button 
+                  type="submit"
+                  style={{
+                    padding: '10px 20px',
+                    border: 'none',
+                    backgroundColor: '#007bff',
+                    color: 'white',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
                   {editingNoticia ? 'Actualizar' : 'Crear'}
                 </button>
               </div>

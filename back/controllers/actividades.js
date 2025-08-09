@@ -3,7 +3,7 @@ const { conection } = require("../config/db");
 
 //crea la funcion con los paramtros request y response
 const todoActividades = (req, res) => {
-  const query = "SELECT * FROM actividades WHERE activa = TRUE;";
+  const query = "SELECT * FROM actividades ORDER BY fecha_creacion DESC;";
 
   conection.query(query, (err, results) => {
     if (err) throw err;
