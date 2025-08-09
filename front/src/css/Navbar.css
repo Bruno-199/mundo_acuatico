@@ -1,0 +1,23 @@
+.navbar {
+    padding: 1rem 0;
+  }
+  
+  .img-logo {
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+  }
+
+@media (max-width: 768px) {
+  .img-logo {
+    height: 30px;
+  }
+
+  .navbar {
+    padding: 0.5rem 0;
+  }
+}
