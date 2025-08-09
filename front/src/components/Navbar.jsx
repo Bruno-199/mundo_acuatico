@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import logoImage from '../assets/logo.jpeg';
 import '../css/Navbar.css';
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const authStatus = localStorage.getItem('isAuthenticated');
@@ -29,68 +32,70 @@ const Navbar = () => {
     navigate('/');
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
+  const isActiveLink = (path) => {
+    return location.pathname === path ? 'nav-link active' : 'nav-link';
+  };
+
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div className="container">
-        <Link className="navbar-brand" to="/">
-          Mundo Acuatico
+    <nav className="navbar">
+      <div className="navbar-container">
+        <Link className="navbar-brand" to="/" onClick={closeMenu}>
+          <img src={logoImage} alt="Mundo Acuático Logo" className="navbar-logo" />
+          <span className="navbar-title">Mundo Acuático</span>
         </Link>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
+        
+        <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
+          <Link className={isActiveLink('/nosotros')} to="/nosotros" onClick={closeMenu}>
+            <i className="fas fa-users"></i>
+            Acerca de Nosotros
+          </Link>
+          <Link className={isActiveLink('/capacitaciones')} to="/capacitaciones" onClick={closeMenu}>
+            <i className="fas fa-swimming-pool"></i>
+            Capacitaciones
+          </Link>
+          
+          {!isAuthenticated ? (
+            <Link className={`${isActiveLink('/Login')} login-btn`} to="/Login" onClick={closeMenu}>
+              <i className="fas fa-sign-in-alt"></i>
+              Iniciar Sesión
+            </Link>
+          ) : (
+            <div className="navbar-user-section">
+              <Link className={isActiveLink('/Admin')} to="/Admin" onClick={closeMenu}>
+                <i className="fas fa-cog"></i>
+                Administrador
+              </Link>
+              {user && (
+                <span className="user-welcome">
+                  <i className="fas fa-user-circle"></i>
+                  Bienvenido, {user.rol === 'Administrador Principal' ? 'Administrador Principal' : user.nombre}
+                </span>
+              )}
+              <button className="logout-btn" onClick={handleLogout}>
+                <i className="fas fa-sign-out-alt"></i>
+                Cerrar Sesión
+              </button>
+            </div>
+          )}
+        </div>
+
+        <button 
+          className={`navbar-toggle ${isMenuOpen ? 'active' : ''}`}
+          onClick={toggleMenu}
           aria-label="Toggle navigation"
         >
-          <span className="navbar-toggler-icon"></span>
+          <span></span>
+          <span></span>
+          <span></span>
         </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/nosotros">
-                Acerca de Nosotros
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/capacitaciones">
-                Capacitaciones
-              </Link>
-            </li>
-            {!isAuthenticated ? (
-              <li className="nav-item">
-                <Link className="nav-link" to="/Login">
-                  Iniciar Sesión
-                </Link>
-              </li>
-            ) : (
-              <>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/Admin">
-                    Administrador
-                  </Link>
-                </li>
-                {user && (
-                  <li className="nav-item">
-                    <span className="navbar-text me-3">
-                      Bienvenido, {user.nombre}
-                    </span>
-                  </li>
-                )}
-                <li className="nav-item">
-                  <button 
-                    className="nav-link btn btn-link" 
-                    onClick={handleLogout}
-                    style={{ border: 'none', background: 'none', color: 'inherit' }}
-                  >
-                    Cerrar Sesión
-                  </button>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
       </div>
     </nav>
   );
