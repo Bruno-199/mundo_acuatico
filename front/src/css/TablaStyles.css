@@ -1,0 +1,569 @@
+.tabla-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .tabla-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .btn-agregar {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .btn-agregar:hover {
+    background-color: #27ae60;
+  }
+  
+  .tabla-admin {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .tabla-admin th,
+  .tabla-admin td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .tabla-admin th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .tabla-admin tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .acciones {
+    white-space: nowrap;
+  }
+  
+  .btn-editar,
+  .btn-eliminar,
+  .btn-publicar {
+    padding: 6px 12px;
+    margin: 0 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-editar {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  .btn-eliminar {
+    background-color: #e74c3c;
+    color: white;
+  }
+
+  .btn-publicar {
+    background-color: #f39c12;
+    color: white;
+  }
+  
+  .btn-editar:hover {
+    background-color: #2980b9;
+  }
+  
+  .btn-eliminar:hover {
+    background-color: #c0392b;
+  }
+
+  .btn-publicar:hover {
+    background-color: #e67e22;
+  }
+
+  .btn-pago {
+    background-color: #9b59b6;
+    color: white;
+  }
+
+  .btn-pago:hover {
+    background-color: #8e44ad;
+  }
+
+  /* Estilos para estados */
+  .estado {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .estado.activo,
+  .estado-activo {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .estado.inactivo,
+  .estado-inactivo {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .estado.borrador,
+  .estado-borrador {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  .estado.publicado,
+  .estado-publicado {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .estado.pendiente,
+  .estado-pendiente {
+    background-color: #e2e3e5;
+    color: #383d41;
+  }
+
+  .estado.archivado,
+  .estado-archivado {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .estado.pausada,
+  .estado-pausada {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  .estado.cancelada,
+  .estado-cancelada {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  /* Estilos específicos para componentes */
+  .actividad-nombre {
+    display: flex;
+    align-items: center;
+  }
+
+  .descripcion-corta {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dias-semana {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .horario-tiempo {
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .inscriptos.completo {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+
+  .suscriptor-info .nombre {
+    font-weight: 500;
+  }
+
+  .suscriptor-info .email {
+    color: #666;
+    font-size: 0.8rem;
+  }
+
+  .horario-info .dias {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .horario-info .horas {
+    color: #666;
+    font-size: 0.8rem;
+  }
+
+  .dias-pago.alerta {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+
+  /* Estilos para modales */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Z-index alto para estar por encima de todo */
+  }
+
+  .modal {
+    background-color: white !important;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 10001;
+    margin: auto;
+    display: block;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    color: #333;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover {
+    color: #333;
+  }
+
+  .modal-form {
+    padding: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 16px;
+  }
+
+  .form-row .form-group {
+    flex: 1;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #dee2e6;
+    margin-top: 20px;
+  }
+
+  .modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+
+  .modal-actions button[type="button"] {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .modal-actions button[type="button"]:hover {
+    background-color: #5a6268;
+  }
+
+  .modal-actions button[type="submit"] {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .modal-actions button[type="submit"]:hover {
+    background-color: #218838;
+  }
+
+  /* Loading y error */
+  .loading {
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+    color: #666;
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .error-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 40px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .error-message i {
+    font-size: 24px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .error-message p {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+  }
+
+  .btn-retry {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+  }
+
+  .btn-retry:hover {
+    background-color: #c82333;
+  }
+
+  .error {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  /* Estilos para validaciones de formulario */
+  .form-group input.error,
+  .form-group textarea.error,
+  .form-group select.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+  }
+
+  .error-text {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .form-help {
+    color: #6c757d;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Estilos para campo de contraseña */
+  .password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .password-input-container input {
+    padding-right: 40px;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+    padding: 4px;
+    font-size: 14px;
+  }
+
+  .password-toggle:hover {
+    color: #333;
+  }
+
+  /* Estilos para botones con estado de carga */
+  .modal-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .modal-actions button.loading {
+    position: relative;
+  }
+
+  .modal-actions button.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Mejoras para botones de acción */
+  .btn-editar:disabled,
+  .btn-eliminar:disabled,
+  .btn-publicar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-editar:disabled:hover,
+  .btn-eliminar:disabled:hover,
+  .btn-publicar:disabled:hover {
+    background-color: inherit;
+  }
+
+@media (max-width: 768px) {
+  .tabla-container {
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  .tabla-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tabla-admin th,
+  .tabla-admin td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .btn-editar,
+  .btn-eliminar,
+  .btn-publicar {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    margin: 2px;
+  }
+
+  .modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 15px;
+  }
+
+  .modal-form {
+    padding: 15px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .acciones {
+    min-width: 120px;
+  }
+}
