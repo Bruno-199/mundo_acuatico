@@ -24,12 +24,15 @@ const agregarNoticias = (req, res) => {
   // Obtenemos los valores del request body
   const { titulo, contenido, imagen_url, estado, fecha_publicacion } = req.body;
   
+  // Validamos la fecha de publicación - si está vacía o es null, usamos null
+  const fechaPublicacion = fecha_publicacion && fecha_publicacion.trim() !== '' ? fecha_publicacion : null;
+  
   // Creamos la consulta SQL para insertar una nueva noticia
   const query = `INSERT INTO noticias (titulo, contenido, imagen_url, estado, fecha_publicacion) 
                  VALUES (?, ?, ?, ?, ?)`;
   
   // Ejecutamos la consulta con los valores parametrizados
-  conection.query(query, [titulo, contenido, imagen_url, estado, fecha_publicacion], (err, results) => {
+  conection.query(query, [titulo, contenido, imagen_url, estado, fechaPublicacion], (err, results) => {
     if (err) throw err;
     res.send(results);
   });
@@ -49,6 +52,9 @@ const editarNoticias = (req, res) => {
   const id = req.params.id;
   const { titulo, contenido, imagen_url, estado, fecha_publicacion } = req.body;
 
+  // Validamos la fecha de publicación - si está vacía o es null, usamos null
+  const fechaPublicacion = fecha_publicacion && fecha_publicacion.trim() !== '' ? fecha_publicacion : null;
+
   const query = `UPDATE noticias 
                  SET titulo = ?, 
                      contenido = ?, 
@@ -57,7 +63,7 @@ const editarNoticias = (req, res) => {
                      fecha_publicacion = ?
                  WHERE id = ?`;
   
-  conection.query(query, [titulo, contenido, imagen_url, estado, fecha_publicacion, id], (err, results) => {
+  conection.query(query, [titulo, contenido, imagen_url, estado, fechaPublicacion, id], (err, results) => {
     if (err) throw err;
     res.send(results);
   });

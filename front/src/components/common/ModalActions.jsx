@@ -1,6 +1,7 @@
+import PropTypes from 'prop-types';
+
 const ModalActions = ({ 
   onCancel, 
-  onSubmit, 
   submitText = 'Guardar',
   cancelText = 'Cancelar',
   isEditing = false,
@@ -51,6 +52,14 @@ const ModalActions = ({
       </button>
     </div>
   );
+};
+
+ModalActions.propTypes = {
+  onCancel: PropTypes.func.isRequired,
+  submitText: PropTypes.string,
+  cancelText: PropTypes.string,
+  isEditing: PropTypes.bool,
+  submitting: PropTypes.bool
 };
 
 export default ModalActions;

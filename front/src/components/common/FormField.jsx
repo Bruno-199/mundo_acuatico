@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const FormField = ({ 
   type = 'text',
   id,
@@ -106,6 +108,26 @@ const FormField = ({
       )}
     </div>
   );
+};
+
+FormField.propTypes = {
+  type: PropTypes.string,
+  id: PropTypes.string,
+  name: PropTypes.string,
+  label: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onChange: PropTypes.func,
+  required: PropTypes.bool,
+  placeholder: PropTypes.string,
+  error: PropTypes.string,
+  options: PropTypes.array,
+  rows: PropTypes.number,
+  style: PropTypes.object,
+  disabled: PropTypes.bool,
+  autoComplete: PropTypes.string,
+  step: PropTypes.string,
+  min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  max: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 };
 
 export default FormField;

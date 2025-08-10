@@ -12,6 +12,16 @@ const noticias = require("./routes/noticias");
 //importa cors
 const cors = require("cors");
 
+// Manejadores globales de errores para evitar que el servidor se caiga
+process.on('uncaughtException', (err) => {
+  console.error('Error no capturado:', err);
+  // No salir del proceso, solo loggear el error
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Promesa rechazada no manejada:', reason);
+});
+
 //crea una variable app en la que almacena la instancia express
 const app = express();
 

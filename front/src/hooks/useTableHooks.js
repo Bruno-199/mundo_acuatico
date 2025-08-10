@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 // Hook personalizado para manejar formularios de tablas
 const useTableForm = (initialData, resetData) => {

@@ -11,8 +11,8 @@ const TablaUsuarios = () => {
   const [formData, setFormData] = useState({
     usuario: '',
     nombre: '',
-    password_hash: '',
-    rol: 'Empleado',
+    password: '', // Cambio password_hash por password
+    rol: 'Editor',
     estado: 'Activo'
   });
   const [formErrors, setFormErrors] = useState({});
@@ -56,10 +56,10 @@ const TablaUsuarios = () => {
     }
 
     // Validar contraseña (solo para nuevos usuarios o si se cambió)
-    if (!editingUsuario && (!formData.password_hash || formData.password_hash.length < 6)) {
-      errors.password_hash = 'La contraseña debe tener al menos 6 caracteres';
-    } else if (editingUsuario && formData.password_hash && formData.password_hash.length < 6) {
-      errors.password_hash = 'La nueva contraseña debe tener al menos 6 caracteres';
+    if (!editingUsuario && (!formData.password || formData.password.length < 6)) {
+      errors.password = 'La contraseña debe tener al menos 6 caracteres';
+    } else if (editingUsuario && formData.password && formData.password.length < 6) {
+      errors.password = 'La nueva contraseña debe tener al menos 6 caracteres';
     }
 
     setFormErrors(errors);
@@ -84,13 +84,13 @@ const TablaUsuarios = () => {
 
       if (editingUsuario) {
         // Al editar, solo incluir password si se proporcionó uno nuevo
-        if (formData.password_hash) {
-          dataToSend.password_hash = formData.password_hash;
+        if (formData.password) {
+          dataToSend.password = formData.password; // Cambio password_hash por password
         }
         await api.put(`/usuarios/editar/${editingUsuario.id}`, dataToSend);
       } else {
         // Al crear, password es requerido
-        dataToSend.password_hash = formData.password_hash;
+        dataToSend.password = formData.password; // Cambio password_hash por password
         await api.post('/usuarios/agregar', dataToSend);
       }
       
@@ -99,8 +99,8 @@ const TablaUsuarios = () => {
       setFormData({
         usuario: '',
         nombre: '',
-        password_hash: '',
-        rol: 'Empleado',
+        password: '', // Cambio password_hash por password
+        rol: 'Editor',
         estado: 'Activo'
       });
       setFormErrors({});
@@ -124,8 +124,8 @@ const TablaUsuarios = () => {
     setFormData({
       usuario: usuario.usuario || '',
       nombre: usuario.nombre || '',
-      password_hash: '', // No mostrar contraseña actual
-      rol: usuario.rol || 'Empleado',
+      password: '', // No mostrar contraseña actual - cambio password_hash por password
+      rol: usuario.rol || 'Editor',
       estado: usuario.estado || 'Activo'
     });
     setFormErrors({});
@@ -153,8 +153,8 @@ const TablaUsuarios = () => {
     setFormData({
       usuario: '',
       nombre: '',
-      password_hash: '',
-      rol: 'Empleado',
+      password: '', // Cambio password_hash por password
+      rol: 'Editor',
       estado: 'Activo'
     });
     setFormErrors({});
@@ -378,12 +378,12 @@ const TablaUsuarios = () => {
                     type={showPassword ? "text" : "password"}
                     id="usuario-password"
                     name="password"
-                    value={formData.password_hash}
-                    onChange={(e) => setFormData({...formData, password_hash: e.target.value})}
+                    value={formData.password} // Cambio password_hash por password
+                    onChange={(e) => setFormData({...formData, password: e.target.value})} // Cambio password_hash por password
                     style={{
                       width: '100%',
                       padding: '10px 40px 10px 10px',
-                      border: formErrors.password_hash ? '1px solid #dc3545' : '1px solid #ddd',
+                      border: formErrors.password ? '1px solid #dc3545' : '1px solid #ddd', // Cambio password_hash por password
                       borderRadius: '5px',
                       fontSize: '14px',
                       boxSizing: 'border-box'
@@ -410,8 +410,8 @@ const TablaUsuarios = () => {
                     <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
                   </button>
                 </div>
-                {formErrors.password_hash && (
-                  <span style={{color: '#dc3545', fontSize: '12px'}}>{formErrors.password_hash}</span>
+                {formErrors.password && ( // Cambio password_hash por password
+                  <span style={{color: '#dc3545', fontSize: '12px'}}>{formErrors.password}</span> // Cambio password_hash por password
                 )}
               </div>
               
@@ -434,10 +434,8 @@ const TablaUsuarios = () => {
                       boxSizing: 'border-box'
                     }}
                   >
-                    <option value="Empleado">Empleado</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Administrador Principal">Administrador Principal</option>
                     <option value="Editor">Editor</option>
+                    <option value="Admin">Administrador</option>
                   </select>
                 </div>
                 

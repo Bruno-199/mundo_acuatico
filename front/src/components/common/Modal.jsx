@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 
 const Modal = ({ 
   isOpen, 
@@ -71,6 +71,15 @@ const Modal = ({
       </div>
     </div>
   );
+};
+
+Modal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  maxWidth: PropTypes.string,
+  onSubmit: PropTypes.func
 };
 
 export default Modal;

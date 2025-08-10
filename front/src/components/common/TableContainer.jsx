@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const TableContainer = ({ title, onAdd, children }) => {
   return (
     <div className="tabla-container">
@@ -10,6 +12,12 @@ const TableContainer = ({ title, onAdd, children }) => {
       {children}
     </div>
   );
+};
+
+TableContainer.propTypes = {
+  title: PropTypes.string.isRequired,
+  onAdd: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired
 };
 
 export default TableContainer;
