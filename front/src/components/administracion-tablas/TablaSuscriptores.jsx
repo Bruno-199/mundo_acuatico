@@ -17,7 +17,7 @@ const TablaSuscriptores = () => {
     contacto_emergencia: '',
     telefono_emergencia: '',
     observaciones: '',
-    estado: 'Activo'
+    estado: 'Pendiente'  // Default según la BD
   });
 
   useEffect(() => {
@@ -38,6 +38,58 @@ const TablaSuscriptores = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validaciones del frontend según las restricciones de la BD
+    if (!formData.nombre || !formData.email || !formData.telefono || !formData.fecha_nacimiento) {
+      alert('Los campos nombre, email, teléfono y fecha de nacimiento son obligatorios');
+      return;
+    }
+
+    // Validación de nombre (mínimo 2 caracteres)
+    if (formData.nombre.trim().length < 2) {
+      alert('El nombre debe tener al menos 2 caracteres');
+      return;
+    }
+
+    // Validación de email
+    if (!formData.email.includes('@')) {
+      alert('El email debe tener un formato válido');
+      return;
+    }
+
+    // Validación de teléfono (mínimo 7 caracteres)
+    if (formData.telefono.length < 7) {
+      alert('El teléfono debe tener al menos 7 caracteres');
+      return;
+    }
+
+    // Validación de teléfono de emergencia (si se proporciona, mínimo 7 caracteres)
+    if (formData.telefono_emergencia && formData.telefono_emergencia.length < 7) {
+      alert('El teléfono de emergencia debe tener al menos 7 caracteres');
+      return;
+    }
+
+    // Validación de DNI (si se proporciona, mínimo 7 caracteres)
+    if (formData.dni && formData.dni.length < 7) {
+      alert('El DNI debe tener al menos 7 caracteres');
+      return;
+    }
+
+    // Validación de fecha de nacimiento
+    const fechaNac = new Date(formData.fecha_nacimiento);
+    const hoy = new Date();
+    if (fechaNac >= hoy) {
+      alert('La fecha de nacimiento debe ser anterior a la fecha actual');
+      return;
+    }
+
+    // Validar edad mínima (5 años)
+    const edad = Math.floor((hoy - fechaNac) / (365.25 * 24 * 60 * 60 * 1000));
+    if (edad < 5) {
+      alert('El suscriptor debe tener al menos 5 años');
+      return;
+    }
+
     try {
       if (editingSuscriptor) {
         await api.put(`/suscriptores/editar/${editingSuscriptor.id}`, formData);
@@ -56,12 +108,13 @@ const TablaSuscriptores = () => {
         contacto_emergencia: '',
         telefono_emergencia: '',
         observaciones: '',
-        estado: 'Activo'
+        estado: 'Pendiente'
       });
       fetchSuscriptores();
     } catch (error) {
       console.error('Error al guardar suscriptor:', error);
-      alert('Error al guardar el suscriptor');
+      const errorMessage = error.response?.data?.error || 'Error al guardar el suscriptor';
+      alert(errorMessage);
     }
   };
 
@@ -77,19 +130,29 @@ const TablaSuscriptores = () => {
       contacto_emergencia: suscriptor.contacto_emergencia || '',
       telefono_emergencia: suscriptor.telefono_emergencia || '',
       observaciones: suscriptor.observaciones || '',
-      estado: suscriptor.estado
+      estado: suscriptor.estado || 'Pendiente'
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres desactivar este suscriptor?')) {
+    const suscriptor = suscriptores.find(s => s.id === id);
+    const action = suscriptor?.estado === 'Inactivo' ? 'activar' : 'desactivar';
+    
+    if (window.confirm(`¿Estás seguro de que quieres ${action} este suscriptor?`)) {
       try {
-        await api.delete(`/suscriptores/eliminar/${id}`);
+        if (suscriptor?.estado === 'Inactivo') {
+          // Reactivar suscriptor (cambiar estado a Activo)
+          await api.put(`/suscriptores/editar/${id}`, {...suscriptor, estado: 'Activo'});
+        } else {
+          // Desactivar suscriptor
+          await api.delete(`/suscriptores/eliminar/${id}`);
+        }
         fetchSuscriptores();
       } catch (error) {
-        console.error('Error al eliminar suscriptor:', error);
-        alert('Error al eliminar el suscriptor');
+        console.error(`Error al ${action} suscriptor:`, error);
+        const errorMessage = error.response?.data?.error || `Error al ${action} el suscriptor`;
+        alert(errorMessage);
       }
     }
   };
@@ -106,7 +169,7 @@ const TablaSuscriptores = () => {
       contacto_emergencia: '',
       telefono_emergencia: '',
       observaciones: '',
-      estado: 'Activo'
+      estado: 'Pendiente'
     });
     setShowModal(true);
   };
@@ -172,7 +235,7 @@ const TablaSuscriptores = () => {
                 </span>
               </td>
               <td>
-                {new Date(suscriptor.fecha_registro).toLocaleDateString()}
+                {suscriptor.fecha_creacion ? new Date(suscriptor.fecha_creacion).toLocaleDateString() : '-'}
               </td>
               <td className="acciones">
                 <button 
@@ -185,7 +248,7 @@ const TablaSuscriptores = () => {
                   className="btn-eliminar"
                   onClick={() => handleDelete(suscriptor.id)}
                 >
-                  Eliminar
+                  {suscriptor.estado === 'Inactivo' ? 'Activar' : 'Desactivar'}
                 </button>
               </td>
             </tr>
@@ -270,9 +333,12 @@ const TablaSuscriptores = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    minLength={2}
+                    maxLength={100}
                     required
                     autoComplete="name"
                   />
+                  <small style={{color: '#666', fontSize: '12px'}}>Mínimo 2 caracteres</small>
                 </div>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
@@ -292,15 +358,18 @@ const TablaSuscriptores = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    minLength={7}
+                    maxLength={20}
                     placeholder="12345678"
                   />
+                  <small style={{color: '#666', fontSize: '12px'}}>Opcional, mínimo 7 caracteres si se proporciona</small>
                 </div>
               </div>
               
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Email:
+                    Email: *
                   </label>
                   <input
                     type="email"
@@ -316,13 +385,15 @@ const TablaSuscriptores = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    maxLength={100}
+                    required
                     autoComplete="email"
                     placeholder="ejemplo@email.com"
                   />
                 </div>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Teléfono:
+                    Teléfono: *
                   </label>
                   <input
                     type="tel"
@@ -338,16 +409,20 @@ const TablaSuscriptores = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    minLength={7}
+                    maxLength={20}
+                    required
                     autoComplete="tel"
                     placeholder="+54 11 1234-5678"
                   />
+                  <small style={{color: '#666', fontSize: '12px'}}>Mínimo 7 caracteres</small>
                 </div>
               </div>
 
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Fecha de nacimiento:
+                    Fecha de nacimiento: *
                   </label>
                   <input
                     type="date"
@@ -363,8 +438,11 @@ const TablaSuscriptores = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 5)).toISOString().split('T')[0]}
+                    required
                     autoComplete="bday"
                   />
+                  <small style={{color: '#666', fontSize: '12px'}}>Mínimo 5 años de edad</small>
                 </div>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
@@ -401,6 +479,7 @@ const TablaSuscriptores = () => {
                   value={formData.direccion}
                   onChange={(e) => setFormData({...formData, direccion: e.target.value})}
                   rows={2}
+                  maxLength={200}
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -413,6 +492,7 @@ const TablaSuscriptores = () => {
                   autoComplete="address"
                   placeholder="Calle, número, ciudad, provincia"
                 />
+                <small style={{color: '#666', fontSize: '12px'}}>Máximo 200 caracteres</small>
               </div>
 
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
@@ -434,6 +514,7 @@ const TablaSuscriptores = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    maxLength={100}
                     placeholder="Nombre del contacto"
                   />
                 </div>
@@ -455,8 +536,11 @@ const TablaSuscriptores = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    minLength={7}
+                    maxLength={20}
                     placeholder="+54 11 1234-5678"
                   />
+                  <small style={{color: '#666', fontSize: '12px'}}>Mínimo 7 caracteres si se proporciona</small>
                 </div>
               </div>
 

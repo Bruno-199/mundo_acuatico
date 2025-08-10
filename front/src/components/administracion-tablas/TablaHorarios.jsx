@@ -15,7 +15,7 @@ const TablaHorarios = () => {
     dias_semana: '',
     hora_inicio: '',
     hora_fin: '',
-    cupo_maximo: '',
+    cupo_maximo: 20, // Default según la BD
     observaciones: '',
     activo: true
   });
@@ -58,11 +58,50 @@ const TablaHorarios = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validaciones del frontend según las restricciones de la BD
+    if (!formData.actividad_id || !formData.profesor_id || !formData.dias_semana || 
+        !formData.hora_inicio || !formData.hora_fin) {
+      alert('Por favor completa todos los campos obligatorios');
+      return;
+    }
+
+    // Validación del cupo máximo (1-50)
+    const cupo = parseInt(formData.cupo_maximo) || 20;
+    if (cupo < 1 || cupo > 50) {
+      alert('El cupo máximo debe estar entre 1 y 50 personas');
+      return;
+    }
+
+    // Validación de días de la semana (mínimo 5 caracteres)
+    if (formData.dias_semana.length < 5) {
+      alert('Los días de la semana deben tener al menos 5 caracteres (ej: Lunes)');
+      return;
+    }
+
+    // Validación de horarios
+    if (formData.hora_inicio >= formData.hora_fin) {
+      alert('La hora de inicio debe ser anterior a la hora de fin');
+      return;
+    }
+
+    // Validación de observaciones (máximo 200 caracteres)
+    if (formData.observaciones && formData.observaciones.length > 200) {
+      alert('Las observaciones no pueden exceder 200 caracteres');
+      return;
+    }
+
     try {
+      // Asegurar que cupo_maximo tenga un valor válido
+      const dataToSend = {
+        ...formData,
+        cupo_maximo: cupo
+      };
+
       if (editingHorario) {
-        await api.put(`/horarios/editar/${editingHorario.id}`, formData);
+        await api.put(`/horarios/editar/${editingHorario.id}`, dataToSend);
       } else {
-        await api.post('/horarios/agregar', formData);
+        await api.post('/horarios/agregar', dataToSend);
       }
       setShowModal(false);
       setEditingHorario(null);
@@ -72,14 +111,15 @@ const TablaHorarios = () => {
         dias_semana: '',
         hora_inicio: '',
         hora_fin: '',
-        cupo_maximo: '',
+        cupo_maximo: 20,
         observaciones: '',
         activo: true
       });
       fetchHorarios();
     } catch (error) {
       console.error('Error al guardar horario:', error);
-      alert('Error al guardar el horario');
+      const errorMessage = error.response?.data?.error || 'Error al guardar el horario';
+      alert(errorMessage);
     }
   };
 
@@ -91,21 +131,31 @@ const TablaHorarios = () => {
       dias_semana: horario.dias_semana,
       hora_inicio: horario.hora_inicio,
       hora_fin: horario.hora_fin,
-      cupo_maximo: horario.cupo_maximo,
+      cupo_maximo: horario.cupo_maximo || 20,
       observaciones: horario.observaciones || '',
-      activo: horario.activo
+      activo: Boolean(horario.activo) // Asegurar que sea booleano
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres desactivar este horario?')) {
+    const horario = horarios.find(h => h.id === id);
+    const action = horario?.activo ? 'desactivar' : 'activar';
+    
+    if (window.confirm(`¿Estás seguro de que quieres ${action} este horario?`)) {
       try {
-        await api.delete(`/horarios/eliminar/${id}`);
+        if (horario?.activo) {
+          // Desactivar horario
+          await api.delete(`/horarios/eliminar/${id}`);
+        } else {
+          // Activar horario (cambiar activo a true)
+          await api.put(`/horarios/editar/${id}`, {...horario, activo: true});
+        }
         fetchHorarios();
       } catch (error) {
-        console.error('Error al eliminar horario:', error);
-        alert('Error al eliminar el horario');
+        console.error(`Error al ${action} horario:`, error);
+        const errorMessage = error.response?.data?.error || `Error al ${action} el horario`;
+        alert(errorMessage);
       }
     }
   };
@@ -118,7 +168,7 @@ const TablaHorarios = () => {
       dias_semana: '',
       hora_inicio: '',
       hora_fin: '',
-      cupo_maximo: '',
+      cupo_maximo: 20,
       observaciones: '',
       activo: true
     });
@@ -213,7 +263,7 @@ const TablaHorarios = () => {
                   className="btn-eliminar"
                   onClick={() => handleDelete(horario.id)}
                 >
-                  Eliminar
+                  {horario.activo ? 'Desactivar' : 'Activar'}
                 </button>
               </td>
             </tr>
@@ -355,9 +405,57 @@ const TablaHorarios = () => {
                     boxSizing: 'border-box'
                   }}
                   placeholder="Ej: Lunes, Miércoles, Viernes"
+                  minLength={5}
+                  maxLength={50}
                   required
                 />
-                <small style={{color: '#666', fontSize: '12px'}}>Separar días con comas</small>
+                <small style={{color: '#666', fontSize: '12px'}}>
+                  Separar días con comas. Mínimo 5 caracteres (ej: Lunes)
+                </small>
+                <div style={{marginTop: '8px', display: 'flex', gap: '5px', flexWrap: 'wrap'}}>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({...formData, dias_semana: 'Lunes, Miércoles, Viernes'})}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: '11px',
+                      backgroundColor: '#f0f0f0',
+                      border: '1px solid #ccc',
+                      borderRadius: '3px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    L-M-V
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({...formData, dias_semana: 'Martes, Jueves'})}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: '11px',
+                      backgroundColor: '#f0f0f0',
+                      border: '1px solid #ccc',
+                      borderRadius: '3px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    M-J
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({...formData, dias_semana: 'Sábado'})}
+                    style={{
+                      padding: '4px 8px',
+                      fontSize: '11px',
+                      backgroundColor: '#f0f0f0',
+                      border: '1px solid #ccc',
+                      borderRadius: '3px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Sábado
+                  </button>
+                </div>
               </div>
 
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
@@ -415,6 +513,7 @@ const TablaHorarios = () => {
                     id="horario-cupo"
                     name="cupo_maximo"
                     min="1"
+                    max="50"
                     value={formData.cupo_maximo}
                     onChange={(e) => setFormData({...formData, cupo_maximo: e.target.value})}
                     style={{
@@ -427,6 +526,9 @@ const TablaHorarios = () => {
                     }}
                     required
                   />
+                  <small style={{color: '#666', fontSize: '12px'}}>
+                    Entre 1 y 50 personas (default: 20)
+                  </small>
                 </div>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
@@ -435,7 +537,7 @@ const TablaHorarios = () => {
                   <select
                     id="horario-estado"
                     name="activo"
-                    value={formData.activo}
+                    value={formData.activo ? 'true' : 'false'}
                     onChange={(e) => setFormData({...formData, activo: e.target.value === 'true'})}
                     style={{
                       width: '100%',
@@ -446,8 +548,8 @@ const TablaHorarios = () => {
                       boxSizing: 'border-box'
                     }}
                   >
-                    <option value={true}>Activo</option>
-                    <option value={false}>Inactivo</option>
+                    <option value="true">Activo</option>
+                    <option value="false">Inactivo</option>
                   </select>
                 </div>
               </div>
@@ -462,6 +564,7 @@ const TablaHorarios = () => {
                   value={formData.observaciones}
                   onChange={(e) => setFormData({...formData, observaciones: e.target.value})}
                   rows={3}
+                  maxLength={200}
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -473,6 +576,9 @@ const TablaHorarios = () => {
                   }}
                   placeholder="Observaciones adicionales..."
                 />
+                <small style={{color: '#666', fontSize: '12px'}}>
+                  Máximo 200 caracteres ({formData.observaciones.length}/200)
+                </small>
               </div>
 
               <div style={{

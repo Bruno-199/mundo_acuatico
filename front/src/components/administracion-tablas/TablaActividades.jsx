@@ -13,7 +13,7 @@ const TablaActividades = () => {
     form_url: '',
     imagen_url: '',
     precio_mensual: '',
-    activa: true
+    estado: 'Activo' // Cambio activa por estado
   });
 
   useEffect(() => {
@@ -34,12 +34,34 @@ const TablaActividades = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validaciones básicas
+    if (!formData.nombre || formData.nombre.trim().length < 3) {
+      alert('El nombre debe tener al menos 3 caracteres');
+      return;
+    }
+    
+    if (formData.precio_mensual && parseFloat(formData.precio_mensual) < 0) {
+      alert('El precio mensual no puede ser negativo');
+      return;
+    }
+    
     try {
+      const dataToSend = {
+        nombre: formData.nombre.trim(),
+        descripcion: formData.descripcion?.trim() || '',
+        form_url: formData.form_url?.trim() || '',
+        imagen_url: formData.imagen_url?.trim() || '',
+        precio_mensual: parseFloat(formData.precio_mensual) || 0.00,
+        estado: formData.estado
+      };
+
       if (editingActividad) {
-        await api.put(`/actividades/editar/${editingActividad.id}`, formData);
+        await api.put(`/actividades/editar/${editingActividad.id}`, dataToSend);
       } else {
-        await api.post('/actividades/agregar', formData);
+        await api.post('/actividades/agregar', dataToSend);
       }
+      
       setShowModal(false);
       setEditingActividad(null);
       setFormData({
@@ -48,12 +70,14 @@ const TablaActividades = () => {
         form_url: '',
         imagen_url: '',
         precio_mensual: '',
-        activa: true
+        estado: 'Activo'
       });
       fetchActividades();
+      
+      alert(editingActividad ? 'Actividad actualizada correctamente' : 'Actividad creada correctamente');
     } catch (error) {
       console.error('Error al guardar actividad:', error);
-      alert('Error al guardar la actividad');
+      alert('Error al guardar la actividad: ' + (error.message || 'Error desconocido'));
     }
   };
 
@@ -61,11 +85,11 @@ const TablaActividades = () => {
     setEditingActividad(actividad);
     setFormData({
       nombre: actividad.nombre,
-      descripcion: actividad.descripcion,
+      descripcion: actividad.descripcion || '',
       form_url: actividad.form_url || '',
       imagen_url: actividad.imagen_url || '',
       precio_mensual: actividad.precio_mensual || '',
-      activa: actividad.activa
+      estado: actividad.estado || 'Activo' // Cambio activa por estado
     });
     setShowModal(true);
   };
@@ -90,7 +114,7 @@ const TablaActividades = () => {
       form_url: '',
       imagen_url: '',
       precio_mensual: '',
-      activa: true
+      estado: 'Activo'
     });
     setShowModal(true);
   };
@@ -159,8 +183,8 @@ const TablaActividades = () => {
                 }
               </td>
               <td>
-                <span className={`estado ${actividad.activa ? 'activo' : 'inactivo'}`}>
-                  {actividad.activa ? 'Activa' : 'Inactiva'}
+                <span className={`estado ${actividad.estado === 'Activo' ? 'activo' : 'inactivo'}`}>
+                  {actividad.estado}
                 </span>
               </td>
               <td>
@@ -262,13 +286,17 @@ const TablaActividades = () => {
                     boxSizing: 'border-box'
                   }}
                   required
+                  minLength="3"
                   autoComplete="off"
                 />
+                <small style={{display: 'block', marginTop: '3px', color: '#666', fontSize: '12px'}}>
+                  Mínimo 3 caracteres
+                </small>
               </div>
               
               <div style={{marginBottom: '15px'}}>
                 <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                  Descripción: *
+                  Descripción: (Opcional)
                 </label>
                 <textarea
                   id="actividad-descripcion"
@@ -285,14 +313,14 @@ const TablaActividades = () => {
                     boxSizing: 'border-box',
                     resize: 'vertical'
                   }}
-                  required
+                  placeholder="Descripción de la actividad..."
                 />
               </div>
 
               <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Precio Mensual:
+                    Precio Mensual: *
                   </label>
                   <input
                     type="number"
@@ -310,35 +338,40 @@ const TablaActividades = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    placeholder="0.00"
+                    required
                   />
                 </div>
-                <div>
-                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Estado:
-                  </label>
-                  <select
-                    id="actividad-estado"
-                    name="activa"
-                    value={formData.activa}
-                    onChange={(e) => setFormData({...formData, activa: e.target.value === 'true'})}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '5px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  >
-                    <option value={true}>Activa</option>
-                    <option value={false}>Inactiva</option>
-                  </select>
-                </div>
+                
+                {editingActividad && (
+                  <div>
+                    <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                      Estado:
+                    </label>
+                    <select
+                      id="actividad-estado"
+                      name="estado"
+                      value={formData.estado}
+                      onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #ddd',
+                        borderRadius: '5px',
+                        fontSize: '14px',
+                        boxSizing: 'border-box'
+                      }}
+                    >
+                      <option value="Activo">Activo</option>
+                      <option value="Inactivo">Inactivo</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div style={{marginBottom: '15px'}}>
                 <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                  URL del formulario:
+                  URL del formulario: (Opcional)
                 </label>
                 <input
                   type="url"
@@ -360,7 +393,7 @@ const TablaActividades = () => {
 
               <div style={{marginBottom: '20px'}}>
                 <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                  URL de imagen:
+                  URL de imagen: (Opcional)
                 </label>
                 <input
                   type="url"

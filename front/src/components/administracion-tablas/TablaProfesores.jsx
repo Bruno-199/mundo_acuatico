@@ -10,10 +10,8 @@ const TablaProfesores = () => {
   const [editingProfesor, setEditingProfesor] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
-    especialidad: '',
     telefono: '',
     email: '',
-    horario: '',
     estado: 'Activo'
   });
 
@@ -43,9 +41,9 @@ const TablaProfesores = () => {
       errors.nombre = 'El nombre debe tener al menos 2 caracteres';
     }
 
-    // Validar especialidad
-    if (!formData.especialidad || formData.especialidad.trim().length < 3) {
-      errors.especialidad = 'La especialidad debe tener al menos 3 caracteres';
+    // Validar teléfono - ahora es requerido
+    if (!formData.telefono || formData.telefono.trim().length < 7) {
+      errors.telefono = 'El teléfono es requerido y debe tener al menos 7 caracteres';
     }
 
     // Validar email si se proporciona
@@ -53,14 +51,6 @@ const TablaProfesores = () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
         errors.email = 'El email no tiene un formato válido';
-      }
-    }
-
-    // Validar teléfono si se proporciona
-    if (formData.telefono && formData.telefono.trim()) {
-      const phoneRegex = /^[\d\s\-+()]{8,15}$/;
-      if (!phoneRegex.test(formData.telefono)) {
-        errors.telefono = 'El teléfono debe tener entre 8 y 15 dígitos';
       }
     }
 
@@ -76,13 +66,17 @@ const TablaProfesores = () => {
 
     try {
       const dataToSend = {
-        ...formData,
         nombre: formData.nombre.trim(),
-        especialidad: formData.especialidad.trim(),
-        telefono: formData.telefono?.trim() || null,
-        email: formData.email?.trim() || null,
-        horario: formData.horario?.trim() || null
+        especialidad: '', // Enviar como cadena vacía
+        telefono: formData.telefono.trim(),
+        email: formData.email?.trim() || '',
+        horario: '' // Enviar como cadena vacía
       };
+
+      // Solo añadir estado si estamos editando
+      if (editingProfesor) {
+        dataToSend.estado = formData.estado;
+      }
 
       if (editingProfesor) {
         await api.put(`/profesores/editar/${editingProfesor.id}`, dataToSend);
@@ -94,10 +88,8 @@ const TablaProfesores = () => {
       setEditingProfesor(null);
       setFormData({
         nombre: '',
-        especialidad: '',
         telefono: '',
         email: '',
-        horario: '',
         estado: 'Activo'
       });
       fetchProfesores();
@@ -114,10 +106,8 @@ const TablaProfesores = () => {
     setEditingProfesor(profesor);
     setFormData({
       nombre: profesor.nombre,
-      especialidad: profesor.especialidad,
       telefono: profesor.telefono || '',
       email: profesor.email || '',
-      horario: profesor.horario || '',
       estado: profesor.estado
     });
     setShowModal(true);
@@ -143,10 +133,8 @@ const TablaProfesores = () => {
     setEditingProfesor(null);
     setFormData({
       nombre: '',
-      especialidad: '',
       telefono: '',
       email: '',
-      horario: '',
       estado: 'Activo'
     });
     setShowModal(true);
@@ -323,14 +311,14 @@ const TablaProfesores = () => {
               
               <div style={{marginBottom: '15px'}}>
                 <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                  Especialidad: *
+                  Teléfono: *
                 </label>
                 <input
-                  type="text"
-                  id="profesor-especialidad"
-                  name="especialidad"
-                  value={formData.especialidad}
-                  onChange={(e) => setFormData({...formData, especialidad: e.target.value})}
+                  type="tel"
+                  id="profesor-telefono"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={(e) => setFormData({...formData, telefono: e.target.value})}
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -339,92 +327,26 @@ const TablaProfesores = () => {
                     fontSize: '14px',
                     boxSizing: 'border-box'
                   }}
-                  placeholder="Ej: Natación, Aqua aeróbicos, etc."
+                  placeholder="Ej: +54 11 1234-5678"
                   required
-                  autoComplete="organization-title"
+                  minLength="7"
+                  autoComplete="tel"
                 />
-              </div>
-              
-              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
-                <div>
-                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Teléfono:
-                  </label>
-                  <input
-                    type="tel"
-                    id="profesor-telefono"
-                    name="telefono"
-                    value={formData.telefono}
-                    onChange={(e) => setFormData({...formData, telefono: e.target.value})}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '5px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                    placeholder="Ej: +54 11 1234-5678"
-                    autoComplete="tel"
-                  />
-                </div>
-                
-                <div>
-                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Email:
-                  </label>
-                  <input
-                    type="email"
-                    id="profesor-email"
-                    name="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '5px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                    placeholder="profesor@mundoacuatico.com"
-                    autoComplete="email"
-                  />
-                </div>
+                <small style={{display: 'block', marginTop: '3px', color: '#666', fontSize: '12px'}}>
+                  Mínimo 7 caracteres
+                </small>
               </div>
               
               <div style={{marginBottom: '15px'}}>
                 <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                  Horario:
+                  Email: (Opcional)
                 </label>
-                <textarea
-                  id="profesor-horario"
-                  name="horario"
-                  value={formData.horario}
-                  onChange={(e) => setFormData({...formData, horario: e.target.value})}
-                  rows={3}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '5px',
-                    fontSize: '14px',
-                    boxSizing: 'border-box',
-                    resize: 'vertical'
-                  }}
-                  placeholder="Ej: Lunes a Viernes 9:00-17:00, Sábados 9:00-13:00"
-                />
-              </div>
-              
-              <div style={{marginBottom: '20px'}}>
-                <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                  Estado:
-                </label>
-                <select
-                  id="profesor-estado"
-                  name="estado"
-                  value={formData.estado}
-                  onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                <input
+                  type="email"
+                  id="profesor-email"
+                  name="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -433,11 +355,35 @@ const TablaProfesores = () => {
                     fontSize: '14px',
                     boxSizing: 'border-box'
                   }}
-                >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                </select>
+                  placeholder="profesor@mundoacuatico.com"
+                  autoComplete="email"
+                />
               </div>
+              
+              {editingProfesor && (
+                <div style={{marginBottom: '20px'}}>
+                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
+                    Estado:
+                  </label>
+                  <select
+                    id="profesor-estado"
+                    name="estado"
+                    value={formData.estado}
+                    onChange={(e) => setFormData({...formData, estado: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '5px',
+                      fontSize: '14px',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                  </select>
+                </div>
+              )}
               
               <div style={{
                 display: 'flex',

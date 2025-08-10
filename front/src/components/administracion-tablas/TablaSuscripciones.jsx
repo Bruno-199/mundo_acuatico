@@ -12,9 +12,7 @@ const TablaSuscripciones = () => {
   const [formData, setFormData] = useState({
     suscriptor_id: '',
     horario_id: '',
-    fecha_inicio: '',
-    fecha_fin: '',
-    estado: 'Activa',
+    estado: 'Pendiente',  // Default según la BD
     monto_mensual: '',
     fecha_ultimo_pago: '',
     metodo_pago: 'Efectivo',
@@ -51,7 +49,8 @@ const TablaSuscripciones = () => {
   const fetchHorarios = async () => {
     try {
       const data = await api.get('/horarios');
-      setHorarios(data);
+      // Filtrar solo horarios activos para nuevas suscripciones
+      setHorarios(data.filter(horario => horario.activo));
     } catch (error) {
       console.error('Error al cargar horarios:', error);
     }
@@ -59,6 +58,29 @@ const TablaSuscripciones = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validaciones del frontend según las restricciones de la BD
+    if (!formData.suscriptor_id || !formData.horario_id || formData.monto_mensual === '') {
+      alert('Los campos suscriptor, horario y monto mensual son obligatorios');
+      return;
+    }
+
+    // Validación de monto (debe ser >= 0)
+    if (parseFloat(formData.monto_mensual) < 0) {
+      alert('El monto mensual debe ser mayor o igual a 0');
+      return;
+    }
+
+    // Validación de fecha de último pago (no puede ser futura)
+    if (formData.fecha_ultimo_pago) {
+      const fechaPago = new Date(formData.fecha_ultimo_pago);
+      const hoy = new Date();
+      if (fechaPago > hoy) {
+        alert('La fecha de último pago no puede ser futura');
+        return;
+      }
+    }
+
     try {
       if (editingSuscripcion) {
         await api.put(`/suscripciones/editar/${editingSuscripcion.id}`, formData);
@@ -70,9 +92,7 @@ const TablaSuscripciones = () => {
       setFormData({
         suscriptor_id: '',
         horario_id: '',
-        fecha_inicio: '',
-        fecha_fin: '',
-        estado: 'Activa',
+        estado: 'Pendiente',
         monto_mensual: '',
         fecha_ultimo_pago: '',
         metodo_pago: 'Efectivo',
@@ -81,7 +101,8 @@ const TablaSuscripciones = () => {
       fetchSuscripciones();
     } catch (error) {
       console.error('Error al guardar suscripción:', error);
-      alert('Error al guardar la suscripción');
+      const errorMessage = error.response?.data?.error || 'Error al guardar la suscripción';
+      alert(errorMessage);
     }
   };
 
@@ -90,9 +111,7 @@ const TablaSuscripciones = () => {
     setFormData({
       suscriptor_id: suscripcion.suscriptor_id,
       horario_id: suscripcion.horario_id,
-      fecha_inicio: suscripcion.fecha_inicio ? suscripcion.fecha_inicio.split('T')[0] : '',
-      fecha_fin: suscripcion.fecha_fin ? suscripcion.fecha_fin.split('T')[0] : '',
-      estado: suscripcion.estado,
+      estado: suscripcion.estado || 'Pendiente',
       monto_mensual: suscripcion.monto_mensual || '',
       fecha_ultimo_pago: suscripcion.fecha_ultimo_pago ? suscripcion.fecha_ultimo_pago.split('T')[0] : '',
       metodo_pago: suscripcion.metodo_pago || 'Efectivo',
@@ -102,22 +121,38 @@ const TablaSuscripciones = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres cancelar esta suscripción?')) {
+    const suscripcion = suscripciones.find(s => s.id === id);
+    const action = suscripcion?.estado === 'Cancelada' ? 'reactivar' : 'cancelar';
+    
+    if (window.confirm(`¿Estás seguro de que quieres ${action} esta suscripción?`)) {
       try {
-        await api.delete(`/suscripciones/eliminar/${id}`);
+        if (suscripcion?.estado === 'Cancelada') {
+          // Reactivar suscripción (cambiar estado a Activa)
+          await api.put(`/suscripciones/editar/${id}`, {...suscripcion, estado: 'Activa'});
+        } else {
+          // Cancelar suscripción
+          await api.delete(`/suscripciones/eliminar/${id}`);
+        }
         fetchSuscripciones();
       } catch (error) {
-        console.error('Error al cancelar suscripción:', error);
-        alert('Error al cancelar la suscripción');
+        console.error(`Error al ${action} suscripción:`, error);
+        const errorMessage = error.response?.data?.error || `Error al ${action} la suscripción`;
+        alert(errorMessage);
       }
     }
   };
 
   const handleRegistrarPago = async (suscripcion) => {
     const fechaPago = new Date().toISOString().split('T')[0];
-    const metodoPago = prompt('Método de pago:', suscripcion.metodo_pago || 'Efectivo');
+    const metodoPago = prompt('Método de pago (Efectivo/Transferencia/Tarjeta):', suscripcion.metodo_pago || 'Efectivo');
     
     if (metodoPago !== null) {
+      const metodosValidos = ['Efectivo', 'Transferencia', 'Tarjeta'];
+      if (!metodosValidos.includes(metodoPago)) {
+        alert('Método de pago no válido. Debe ser: Efectivo, Transferencia o Tarjeta');
+        return;
+      }
+      
       try {
         await api.put(`/suscripciones/pago/${suscripcion.id}`, {
           fecha_ultimo_pago: fechaPago,
@@ -126,7 +161,8 @@ const TablaSuscripciones = () => {
         fetchSuscripciones();
       } catch (error) {
         console.error('Error al registrar pago:', error);
-        alert('Error al registrar el pago');
+        const errorMessage = error.response?.data?.error || 'Error al registrar el pago';
+        alert(errorMessage);
       }
     }
   };
@@ -136,9 +172,7 @@ const TablaSuscripciones = () => {
     setFormData({
       suscriptor_id: '',
       horario_id: '',
-      fecha_inicio: '',
-      fecha_fin: '',
-      estado: 'Activa',
+      estado: 'Pendiente',
       monto_mensual: '',
       fecha_ultimo_pago: '',
       metodo_pago: 'Efectivo',
@@ -248,7 +282,7 @@ const TablaSuscripciones = () => {
                   className="btn-eliminar"
                   onClick={() => handleDelete(suscripcion.id)}
                 >
-                  Cancelar
+                  {suscripcion.estado === 'Cancelada' ? 'Reactivar' : 'Cancelar'}
                 </button>
               </td>
             </tr>
@@ -366,54 +400,11 @@ const TablaSuscripciones = () => {
                     <option value="">Seleccionar horario</option>
                     {horarios.map(horario => (
                       <option key={horario.id} value={horario.id}>
-                        {horario.actividad_nombre} - {horario.dias_semana} ({horario.hora_inicio}-{horario.hora_fin})
+                        {horario.actividad_nombre} - {horario.dias_semana} ({horario.hora_inicio}-{horario.hora_fin}) 
+                        - Cupo: {horario.suscripciones_actuales || 0}/{horario.cupo_maximo}
                       </option>
                     ))}
                   </select>
-                </div>
-              </div>
-
-              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px'}}>
-                <div>
-                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Fecha inicio: *
-                  </label>
-                  <input
-                    type="date"
-                    id="suscripcion-fecha-inicio"
-                    name="fecha_inicio"
-                    value={formData.fecha_inicio}
-                    onChange={(e) => setFormData({...formData, fecha_inicio: e.target.value})}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '5px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                    required
-                  />
-                </div>
-                <div>
-                  <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Fecha fin:
-                  </label>
-                  <input
-                    type="date"
-                    id="suscripcion-fecha-fin"
-                    name="fecha_fin"
-                    value={formData.fecha_fin}
-                    onChange={(e) => setFormData({...formData, fecha_fin: e.target.value})}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '5px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
                 </div>
               </div>
 
@@ -438,13 +429,13 @@ const TablaSuscripciones = () => {
                   >
                     <option value="Activa">Activa</option>
                     <option value="Pendiente">Pendiente</option>
-                    <option value="Pausada">Pausada</option>
+                    <option value="Vencida">Vencida</option>
                     <option value="Cancelada">Cancelada</option>
                   </select>
                 </div>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
-                    Monto mensual:
+                    Monto mensual: * ($)
                   </label>
                   <input
                     type="number"
@@ -462,7 +453,9 @@ const TablaSuscripciones = () => {
                       fontSize: '14px',
                       boxSizing: 'border-box'
                     }}
+                    required
                   />
+                  <small style={{color: '#666', fontSize: '12px'}}>Debe ser mayor o igual a 0</small>
                 </div>
               </div>
 
@@ -477,6 +470,7 @@ const TablaSuscripciones = () => {
                     name="fecha_ultimo_pago"
                     value={formData.fecha_ultimo_pago}
                     onChange={(e) => setFormData({...formData, fecha_ultimo_pago: e.target.value})}
+                    max={new Date().toISOString().split('T')[0]}
                     style={{
                       width: '100%',
                       padding: '10px',
@@ -486,6 +480,7 @@ const TablaSuscripciones = () => {
                       boxSizing: 'border-box'
                     }}
                   />
+                  <small style={{color: '#666', fontSize: '12px'}}>No puede ser fecha futura</small>
                 </div>
                 <div>
                   <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>
@@ -506,9 +501,8 @@ const TablaSuscripciones = () => {
                     }}
                   >
                     <option value="Efectivo">Efectivo</option>
-                    <option value="Tarjeta">Tarjeta</option>
                     <option value="Transferencia">Transferencia</option>
-                    <option value="Mercado Pago">Mercado Pago</option>
+                    <option value="Tarjeta">Tarjeta</option>
                   </select>
                 </div>
               </div>

@@ -110,42 +110,50 @@
     text-transform: uppercase;
   }
 
-  .estado.activo {
+  .estado.activo,
+  .estado-activo {
     background-color: #d4edda;
     color: #155724;
   }
 
-  .estado.inactivo {
+  .estado.inactivo,
+  .estado-inactivo {
     background-color: #f8d7da;
     color: #721c24;
   }
 
-  .estado.borrador {
+  .estado.borrador,
+  .estado-borrador {
     background-color: #fff3cd;
     color: #856404;
   }
 
-  .estado.publicado {
+  .estado.publicado,
+  .estado-publicado {
     background-color: #d4edda;
     color: #155724;
   }
 
-  .estado.pendiente {
+  .estado.pendiente,
+  .estado-pendiente {
     background-color: #e2e3e5;
     color: #383d41;
   }
 
-  .estado.archivado {
+  .estado.archivado,
+  .estado-archivado {
     background-color: #f8d7da;
     color: #721c24;
   }
 
-  .estado.pausada {
+  .estado.pausada,
+  .estado-pausada {
     background-color: #fff3cd;
     color: #856404;
   }
 
-  .estado.cancelada {
+  .estado.cancelada,
+  .estado-cancelada {
     background-color: #f8d7da;
     color: #721c24;
   }
